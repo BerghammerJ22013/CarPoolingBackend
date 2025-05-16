@@ -14,7 +14,17 @@ public class UserRESTController {
     private UserDataService userDataService;
 
     @RequestMapping(value = "/carpooling/auth/register", method = RequestMethod.POST)
-    public UserResource login(@Valid @RequestBody UserDto userDto) {
+    public UserResource register(@Valid @RequestBody UserDto userDto) {
         return userDataService.registerUser(userDto);
+    }
+
+    @RequestMapping(value = "/carpooling/auth/login/{email}/{password}", method = RequestMethod.POST)
+    public UserResource login(@PathVariable String email, @PathVariable String password) {
+        return userDataService.loginUser(email, password);
+    }
+
+    @RequestMapping(value = "/carpooling/user/{id}/{oldPassword}/{newPassword}", method = RequestMethod.PUT)
+    public UserResource changePassword(@PathVariable long id, @PathVariable String oldPassword, @PathVariable String newPassword) {
+        return userDataService.changePassword(id, oldPassword, newPassword);
     }
 }

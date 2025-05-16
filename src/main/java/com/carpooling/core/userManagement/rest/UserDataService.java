@@ -1,10 +1,14 @@
 package com.carpooling.core.userManagement.rest;
 
 import com.carpooling.core.userManagement.database.entities.UserEntity;
-import com.carpooling.core.userManagement.database.repositories.UserRepository;
+import com.carpooling.core.userManagement.database.exceptions.InvalidPasswordException;
+import com.carpooling.core.userManagement.database.exceptions.UserAlreadyExistsException;
+import com.carpooling.core.userManagement.database.exceptions.UserNotInDbException;
 import com.carpooling.core.userManagement.rest.dtos.UserDto;
+import com.carpooling.core.userManagement.rest.exceptions.InvalidChangePasswordException;
+import com.carpooling.core.userManagement.rest.exceptions.InvalidLoginException;
+import com.carpooling.core.userManagement.rest.exceptions.InvalidRegisterException;
 import com.carpooling.core.userManagement.rest.resources.UserResource;
-import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public class UserDataService {
@@ -12,12 +16,38 @@ public class UserDataService {
     UserManager userManager;
 
     public UserResource registerUser(UserDto userDto) {
-        return convertUserEntityToUserResource(userManager.registerUser(userDto));
+        try {
+            return convertUserEntityToUserResource(userManager.registerUser(userDto));
+        } catch (UserAlreadyExistsException e) {
+            throw new InvalidRegisterException(e.getMessage());
+        }
+    }
+
+    public UserResource loginUser(String email, String password) {
+        try {
+            return convertUserEntityToUserResource(userManager.loginUser(email, password));
+        } catch (UserNotInDbException | InvalidPasswordException e) {
+            throw new InvalidLoginException(e.getMessage());
+        }
+    }
+
+    public UserResource changePassword(long id, String oldPassword, String newPassword) {
+        try {
+            return convertUserEntityToUserResource(userManager.changePassword(id, oldPassword, newPassword));
+        } catch (UserNotInDbException | InvalidPasswordException e) {
+            throw new InvalidChangePasswordException(e.getMessage());
+        }
     }
 
     private UserResource convertUserEntityToUserResource(UserEntity userEntity) {
-        return null;
+        UserResource userResource = new UserResource();
+        userResource.setId(userEntity.getId());
+        userResource.setFullname(userEntity.getFullname());
+        userResource.setEmail(userEntity.getEmail());
+        userResource.setSchool(userEntity.getSchool());
+        return userResource;
     }
+
 
 
 }
