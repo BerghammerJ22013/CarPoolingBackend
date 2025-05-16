@@ -1,4 +1,7 @@
 package com.carpooling.core.routeManagment.database.repositories;
 
-public interface RouteRepository {
+import com.carpooling.core.routeManagment.database.entities.RouteEntity;
+import org.springframework.data.repository.CrudRepository;
+
+public interface RouteRepository extends CrudRepository<RouteEntity, Long> {
 }

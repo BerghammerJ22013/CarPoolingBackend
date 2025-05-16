@@ -8,7 +8,7 @@ import lombok.Data;
 
 @Data
 public class UserDto {
-    @NotEmpty
+    @NotNull
     private String fullname;
 
     @Email

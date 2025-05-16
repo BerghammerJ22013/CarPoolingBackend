@@ -11,6 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 public class UserManager {
     @Autowired
@@ -20,21 +22,25 @@ public class UserManager {
     private PasswordEncoder passwordEncoder;
 
 
-
     public UserEntity registerUser(UserDto userDto) throws UserAlreadyExistsException {
-        if(userRepository.existsByEmail(userDto.getEmail()) || userRepository.existsByFullName(userDto.getFullname())) {
-            throw new UserAlreadyExistsException(String.format("User with this email %s or fullname %s already exists", userDto.getEmail(), userDto.getFullname()));
+        if (userRepository.existsByEmail(userDto.getEmail()) || userRepository.existsByFullName(userDto.getFullname())) {
+            throw new UserAlreadyExistsException(String.format("User with this email %s or fullname %s already exists",
+                    userDto.getEmail(),
+                    userDto.getFullname()
+            ));
         }
-        UserEntity storedEntity = userRepository.save(convertUserDtoToUserEntity(userDto));
-        return storedEntity;
+        return userRepository.save(convertUserDtoToUserEntity(userDto));
     }
 
     public UserEntity loginUser(String email, String password) throws UserNotInDbException, InvalidPasswordException {
-        UserEntity userEntity = userRepository.findByEmail(email);
-        if(userEntity == null) {
+        Optional<UserEntity> oUserEntity = userRepository.findByEmail(email);
+        if (oUserEntity.isEmpty()) {
             throw new UserNotInDbException(String.format("User with Email %s not found", email));
         }
-        if(!passwordEncoder.matches(password, userEntity.getPassword())) {
+
+        UserEntity userEntity = oUserEntity.get();
+
+        if (!passwordEncoder.matches(password, userEntity.getPassword())) {
             throw new InvalidPasswordException("Invalid password");
         }
         return userEntity;
@@ -42,7 +48,7 @@ public class UserManager {
 
     public UserEntity changePassword(long id, String oldPassword, String newPassword) throws UserNotInDbException, InvalidPasswordException {
         UserEntity userEntity = userRepository.findById(id).orElseThrow(() -> new UserNotInDbException(String.format("User with ID %d not found", id)));
-        if(!passwordEncoder.matches(oldPassword, userEntity.getPassword())) {
+        if (!passwordEncoder.matches(oldPassword, userEntity.getPassword())) {
             throw new InvalidPasswordException("Invalid password");
         }
         userEntity.setPassword(passwordEncoder.encode(newPassword));
@@ -51,7 +57,6 @@ public class UserManager {
 
     private UserEntity convertUserDtoToUserEntity(@Valid UserDto userDto) {
         UserEntity userEntity = new UserEntity();
-        userEntity.setId(-1L);
         userEntity.setFullname(userDto.getFullname());
         userEntity.setEmail(userDto.getEmail());
         userEntity.setPassword(passwordEncoder.encode(userDto.getPassword()));
