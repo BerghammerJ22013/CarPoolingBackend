@@ -26,4 +26,7 @@ public class RouteEntity {
 
     @ManyToOne
     private UserEntity driver;
+
+    @OneToMany
+    private List<UserEntity> passengers;
 }

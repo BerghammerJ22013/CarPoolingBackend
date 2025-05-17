@@ -14,5 +14,6 @@ public class RouteResource {
     private LocalTime time;
     private int seatsAvailable;
     private List<String> stops;
-    private Long driverId;
+    private String driverName;
+    private List<Long> passengersIds;
 }

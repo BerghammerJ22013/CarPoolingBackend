@@ -1,5 +1,6 @@
 package com.carpooling.core.userManagement.restController;
 
+import com.carpooling.core.userManagement.data.LoginRequest;
 import com.carpooling.core.userManagement.rest.UserDataService;
 import com.carpooling.core.userManagement.rest.dtos.UserDto;
 import com.carpooling.core.userManagement.rest.resources.UserResource;
@@ -18,12 +19,12 @@ public class UserRESTController {
         return userDataService.registerUser(userDto);
     }
 
-    @RequestMapping(value = "/carpooling/auth/login/{email}/{password}", method = RequestMethod.POST)
-    public UserResource login(@PathVariable String email, @PathVariable String password) {
-        return userDataService.loginUser(email, password);
+    @RequestMapping(value = "/carpooling/auth/login", method = RequestMethod.POST)
+    public UserResource login(@RequestBody LoginRequest loginRequest) {
+        return userDataService.loginUser(loginRequest.getEmail(), loginRequest.getPassword());
     }
 
-    @RequestMapping(value = "/carpooling/user/{id}/{oldPassword}/{newPassword}", method = RequestMethod.PUT)
+    @RequestMapping(value = "/carpooling/user/{id}/changePassword/{oldPassword}/{newPassword}", method = RequestMethod.PUT)
     public UserResource changePassword(@PathVariable long id, @PathVariable String oldPassword, @PathVariable String newPassword) {
         return userDataService.changePassword(id, oldPassword, newPassword);
     }

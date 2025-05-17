@@ -8,6 +8,6 @@ import java.util.Optional;
 
 public interface UserRepository extends CrudRepository<UserEntity, Long> {
     boolean existsByEmail(String email);
-    boolean existsByFullName(String fullName);
+    boolean existsByFullname(String fullName);
     Optional<UserEntity> findByEmail(String email);
 }

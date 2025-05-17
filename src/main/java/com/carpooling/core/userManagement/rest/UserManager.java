@@ -23,7 +23,7 @@ public class UserManager {
 
 
     public UserEntity registerUser(UserDto userDto) throws UserAlreadyExistsException {
-        if (userRepository.existsByEmail(userDto.getEmail()) || userRepository.existsByFullName(userDto.getFullname())) {
+        if (userRepository.existsByEmail(userDto.getEmail()) || userRepository.existsByFullname(userDto.getFullname())) {
             throw new UserAlreadyExistsException(String.format("User with this email %s or fullname %s already exists",
                     userDto.getEmail(),
                     userDto.getFullname()
