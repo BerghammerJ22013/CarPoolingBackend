@@ -36,4 +36,21 @@ public class RouteRESTController {
         return routeDataService.getRoutesBySchoolAndSearch(userId, school, search);
     }
 
+    @PutMapping(value = "/carpooling/route/{routeId}/addUser/{userId}")
+    public RouteResource addUserToRoute(@PathVariable long routeId, @PathVariable long userId) {
+        return routeDataService.addUserToRoute(routeId, userId);
+    }
+
+    @GetMapping("/carpooling/test")
+    public RouteResource testRoute() {
+        RouteResource res = new RouteResource();
+        res.setId(1L);
+        res.setFromLocation("Wien");
+        res.setDriverName("Max");
+        res.setSeatsAvailable(3);
+        res.setStops(List.of("A", "B"));
+        return res;
+    }
+
+
 }

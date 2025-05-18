@@ -1,8 +1,11 @@
 package com.carpooling.core.routeManagment.rest;
 
 import com.carpooling.core.routeManagment.database.entities.RouteEntity;
+import com.carpooling.core.routeManagment.database.exceptions.RouteNotInDbException;
+import com.carpooling.core.routeManagment.database.exceptions.UserAlreadyInRouteExceotion;
 import com.carpooling.core.routeManagment.database.repositories.RouteRepository;
 import com.carpooling.core.routeManagment.rest.dtos.RouteDto;
+import com.carpooling.core.userManagement.database.entities.UserEntity;
 import com.carpooling.core.userManagement.database.exceptions.UserNotInDbException;
 import com.carpooling.core.userManagement.database.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +23,18 @@ public class RouteManager {
 
     public RouteEntity addRoute(RouteDto routeDto) throws UserNotInDbException {
         return routeRepository.save(convertRouteDtoToRouteEntity(routeDto));
+    }
+
+    public RouteEntity addUserToRoute(long routeId, long userId) throws UserNotInDbException, RouteNotInDbException, UserAlreadyInRouteExceotion {
+        RouteEntity routeEntity = routeRepository.findById(routeId).orElseThrow(() -> new RouteNotInDbException("Route not found"));
+        UserEntity userEntity = userRepository.findById(userId).orElseThrow(() -> new UserNotInDbException("User not found"));
+        if (!routeEntity.getPassengers().contains(userEntity)) {
+            routeEntity.getPassengers().add(userEntity);
+            routeEntity.setSeatsAvailable(routeEntity.getSeatsAvailable() - 1);
+        }else{
+            throw new UserAlreadyInRouteExceotion("User already in route");
+        }
+        return routeRepository.save(routeEntity);
     }
 
     public List<RouteEntity> getRoutesByUser(long userId) throws UserNotInDbException {
@@ -61,6 +76,4 @@ public class RouteManager {
         routeEntity.setTime(routeDto.getTime());
         return routeEntity;
     }
-
-
 }

@@ -1,11 +1,10 @@
 package com.carpooling.core.routeManagment.rest;
 
 import com.carpooling.core.routeManagment.database.entities.RouteEntity;
+import com.carpooling.core.routeManagment.database.exceptions.RouteNotInDbException;
+import com.carpooling.core.routeManagment.database.exceptions.UserAlreadyInRouteExceotion;
 import com.carpooling.core.routeManagment.rest.dtos.RouteDto;
-import com.carpooling.core.routeManagment.rest.exceptions.InvalidAddRouteException;
-import com.carpooling.core.routeManagment.rest.exceptions.InvalidGetRoutesBySchoolAndSearchException;
-import com.carpooling.core.routeManagment.rest.exceptions.InvalidGetRoutesBySchoolException;
-import com.carpooling.core.routeManagment.rest.exceptions.InvalidGetRoutesByUserException;
+import com.carpooling.core.routeManagment.rest.exceptions.*;
 import com.carpooling.core.routeManagment.rest.resources.RouteResource;
 import com.carpooling.core.userManagement.database.entities.UserEntity;
 import com.carpooling.core.userManagement.database.exceptions.UserNotInDbException;
@@ -23,6 +22,14 @@ public class RouteDataService {
             return convertRouteEntityToRouteResource(routeManager.addRoute(routeDto));
         } catch (UserNotInDbException e) {
             throw new InvalidAddRouteException(e.getMessage());
+        }
+    }
+
+    public RouteResource addUserToRoute(long routeId, long userId) {
+        try {
+            return convertRouteEntityToRouteResource(routeManager.addUserToRoute(routeId, userId));
+        } catch (UserNotInDbException | RouteNotInDbException | UserAlreadyInRouteExceotion e) {
+            throw new InvalidAddUserToRouteException(e.getMessage());
         }
     }
 
@@ -97,6 +104,7 @@ public class RouteDataService {
         routeResource.setPassengersIds(passengersIds);
         return routeResource;
     }
+
 
 
 }
