@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class RouteManager {
     @Autowired
@@ -36,6 +37,20 @@ public class RouteManager {
         return routeEntities;
     }
 
+    public List<RouteEntity> getRoutesBySchoolAndSearch(long userId, String school, String search) throws UserNotInDbException {
+        List<RouteEntity> routeEntities = new ArrayList<>();
+        String searchTwo = "%" + search + "%";
+        routeEntities = routeRepository.findByDriverSchoolAndSearch(school, searchTwo, userRepository.findById(userId).orElseThrow(()
+                -> new UserNotInDbException(String.format("User with ID %d not found", userId))));
+
+        String finalSearch = search;
+        List<RouteEntity> all = (List<RouteEntity>) routeRepository.findAll();
+        List<RouteEntity> filteredRouteEntities = all.stream()
+                .filter(r -> r.getStops().stream().anyMatch(s -> s.contains(finalSearch)))
+                .toList();
+        return filteredRouteEntities;
+    }
+
     private RouteEntity convertRouteDtoToRouteEntity(RouteDto routeDto) throws UserNotInDbException {
         RouteEntity routeEntity = new RouteEntity();
         routeEntity.setDate(routeDto.getDate());
@@ -46,4 +61,6 @@ public class RouteManager {
         routeEntity.setTime(routeDto.getTime());
         return routeEntity;
     }
+
+
 }

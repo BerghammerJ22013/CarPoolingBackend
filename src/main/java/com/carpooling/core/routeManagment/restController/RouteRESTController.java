@@ -31,4 +31,9 @@ public class RouteRESTController {
         return routeDataService.getRoutesBySchool(userId, school);
     }
 
+    @GetMapping(value = "/carpooling/route/get/{userId}/{school}/search/{search}")
+    public List<RouteResource> getRoutesBySchoolAndSearch(@PathVariable long userId, @PathVariable String school, @PathVariable String search) {
+        return routeDataService.getRoutesBySchoolAndSearch(userId, school, search);
+    }
+
 }

@@ -3,13 +3,13 @@ package com.carpooling.core.routeManagment.rest;
 import com.carpooling.core.routeManagment.database.entities.RouteEntity;
 import com.carpooling.core.routeManagment.rest.dtos.RouteDto;
 import com.carpooling.core.routeManagment.rest.exceptions.InvalidAddRouteException;
+import com.carpooling.core.routeManagment.rest.exceptions.InvalidGetRoutesBySchoolAndSearchException;
 import com.carpooling.core.routeManagment.rest.exceptions.InvalidGetRoutesBySchoolException;
 import com.carpooling.core.routeManagment.rest.exceptions.InvalidGetRoutesByUserException;
 import com.carpooling.core.routeManagment.rest.resources.RouteResource;
 import com.carpooling.core.userManagement.database.entities.UserEntity;
 import com.carpooling.core.userManagement.database.exceptions.UserNotInDbException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -60,6 +60,23 @@ public class RouteDataService {
         }
     }
 
+    public List<RouteResource> getRoutesBySchoolAndSearch(long userId, String school, String search) {
+        List<RouteEntity> routeEntities = null;
+        try {
+            routeEntities = routeManager.getRoutesBySchoolAndSearch(userId, school, search);
+            List<RouteResource> routeResources = new ArrayList<>();
+            for (RouteEntity routeEntity : routeEntities) {
+                routeResources.add(convertRouteEntityToRouteResource(routeEntity));
+            }
+            if (routeResources.isEmpty()) {
+                throw new InvalidGetRoutesBySchoolAndSearchException(String.format("User with ID %d has no routes", userId));
+            }
+            return routeResources;
+        } catch (UserNotInDbException e) {
+            throw new InvalidGetRoutesBySchoolAndSearchException(e.getMessage());
+        }
+    }
+
     public RouteResource convertRouteEntityToRouteResource(RouteEntity routeEntity){
         RouteResource routeResource = new RouteResource();
         routeResource.setId(routeEntity.getId());
@@ -80,4 +97,6 @@ public class RouteDataService {
         routeResource.setPassengersIds(passengersIds);
         return routeResource;
     }
+
+
 }
