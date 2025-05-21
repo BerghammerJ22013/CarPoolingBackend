@@ -27,6 +27,6 @@ public class RouteEntity {
     @ManyToOne
     private UserEntity driver;
 
-    @OneToMany
-    private List<UserEntity> passengers;
+    @OneToMany(mappedBy = "route", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<RoutePassengerEntity> passengers;
 }

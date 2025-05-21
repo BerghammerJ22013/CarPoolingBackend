@@ -20,11 +20,11 @@ public class UserRESTController {
     }
 
     @RequestMapping(value = "/carpooling/auth/login", method = RequestMethod.POST)
-    public UserResource login(@RequestBody LoginRequest loginRequest) {
+    public UserResource login(@Valid @RequestBody LoginRequest loginRequest) {
         return userDataService.loginUser(loginRequest.getEmail(), loginRequest.getPassword());
     }
 
-    @RequestMapping(value = "/carpooling/user/{id}/changePassword/{oldPassword}/{newPassword}", method = RequestMethod.PUT)
+    @RequestMapping(value = "/carpooling/user/{id}/password/{oldPassword}/{newPassword}", method = RequestMethod.PUT)
     public UserResource changePassword(@PathVariable long id, @PathVariable String oldPassword, @PathVariable String newPassword) {
         return userDataService.changePassword(id, oldPassword, newPassword);
     }

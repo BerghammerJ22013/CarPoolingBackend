@@ -15,5 +15,5 @@ public class RouteResource {
     private int seatsAvailable;
     private List<String> stops;
     private String driverName;
-    private List<Long> passengersIds;
+    private List<RoutePassengerResource> passengers;
 }
