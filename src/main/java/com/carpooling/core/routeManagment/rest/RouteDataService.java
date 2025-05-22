@@ -42,7 +42,15 @@ public class RouteDataService {
         try{
             return convertRouteEntityToRouteResource(routeManager.removeUserFromRoute(routePassengerDto));
         } catch (UserNotInDbException | RouteNotInDbException e) {
-            throw new RuntimeException(e);
+            throw new InvalidRemovalOfUserException(e.getMessage());
+        }
+    }
+
+    public RouteResource removePassengerFromRoute(long routeId, String fullName) {
+        try {
+            return convertRouteEntityToRouteResource(routeManager.removePassengerFromRoute(routeId, fullName));
+        } catch (RouteNotInDbException | UserNotInDbException e) {
+            throw new InvalidRemovalOfUserException(e.getMessage());
         }
     }
 

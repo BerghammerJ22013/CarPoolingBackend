@@ -64,6 +64,19 @@ public class RouteManager {
         return routeRepository.save(routeEntity);
     }
 
+    public RouteEntity removePassengerFromRoute(long routeId, String fullName) throws RouteNotInDbException, UserNotInDbException {
+        RouteEntity routeEntity = routeRepository.findById(routeId).orElseThrow(() -> new RouteNotInDbException("Route not found"));
+        UserEntity userEntity = userRepository.findByFullname(fullName).orElseThrow(() -> new UserNotInDbException("User not found"));
+
+        RoutePassengerEntity passengerEntity = routePassengerRepository.findByUserAndRoute(userEntity, routeEntity).orElseThrow(() -> new RouteNotInDbException("Passenger not found"));
+
+        routeEntity.getPassengers().remove(passengerEntity);
+        routeEntity.setSeatsAvailable(routeEntity.getSeatsAvailable() + 1);
+        routePassengerRepository.delete(passengerEntity);
+
+        return routeRepository.save(routeEntity);
+    }
+
     public List<RouteEntity> getRoutesByUser(long userId) throws UserNotInDbException, NoRoutesFoundException {
         Optional<List<RouteEntity>> routeEntities = routeRepository.findByDriverOrPassenger(userRepository.findById(userId).orElseThrow(()
                 -> new UserNotInDbException(String.format("User with ID %d not found", userId))));
@@ -112,6 +125,7 @@ public class RouteManager {
         routePassengerEntity.setPickupLocation(routePassengerDto.getPickupLocation());
         return routePassengerEntity;
     }
+
 
 
 }

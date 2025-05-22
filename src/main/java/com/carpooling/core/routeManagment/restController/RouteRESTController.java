@@ -45,4 +45,9 @@ public class RouteRESTController {
     public RouteResource removeUserFromRoute(@Valid @RequestBody RoutePassengerDto routePassengerDto) {
         return routeDataService.removeUserFromRoute(routePassengerDto);
     }
+
+    @DeleteMapping(value = "/carpooling/route/{routeId}/passenger/{fullName}")
+    public RouteResource removePassengerFromRoute(@PathVariable long routeId, @PathVariable String fullName) {
+        return routeDataService.removePassengerFromRoute(routeId, fullName);
+    }
 }
