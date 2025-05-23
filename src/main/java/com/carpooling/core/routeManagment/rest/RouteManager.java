@@ -14,10 +14,8 @@ import com.carpooling.core.userManagement.database.exceptions.UserNotInDbExcepti
 import com.carpooling.core.userManagement.database.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 public class RouteManager {
     @Autowired
@@ -34,8 +32,10 @@ public class RouteManager {
     }
 
     public RouteEntity addUserToRoute(RoutePassengerDto routePassengerDto) throws UserNotInDbException, RouteNotInDbException, UserAlreadyInRouteExceotion {
-        RouteEntity routeEntity = routeRepository.findById(routePassengerDto.getRouteId()).orElseThrow(() -> new RouteNotInDbException("Route not found"));
-        UserEntity userEntity = userRepository.findById(routePassengerDto.getUserId()).orElseThrow(() -> new UserNotInDbException("User not found"));
+        RouteEntity routeEntity = routeRepository.findById(routePassengerDto.getRouteId()).orElseThrow(()
+                -> new RouteNotInDbException("Route not found"));
+        UserEntity userEntity = userRepository.findById(routePassengerDto.getUserId()).orElseThrow(()
+                -> new UserNotInDbException("User not found"));
 
         RoutePassengerEntity passengerEntity = convertRoutePassengerDtoToRoutePassengerEntity(routePassengerDto);
 
@@ -52,8 +52,10 @@ public class RouteManager {
     }
 
     public RouteEntity removeUserFromRoute(RoutePassengerDto routePassengerDto) throws RouteNotInDbException, UserNotInDbException {
-        RouteEntity routeEntity = routeRepository.findById(routePassengerDto.getRouteId()).orElseThrow(() -> new RouteNotInDbException("Route not found"));
-        UserEntity userEntity = userRepository.findById(routePassengerDto.getUserId()).orElseThrow(() -> new UserNotInDbException("User not found"));
+        RouteEntity routeEntity = routeRepository.findById(routePassengerDto.getRouteId()).orElseThrow(()
+                -> new RouteNotInDbException("Route not found"));
+        UserEntity userEntity = userRepository.findById(routePassengerDto.getUserId()).orElseThrow(()
+                -> new UserNotInDbException("User not found"));
 
         RoutePassengerEntity passengerEntity = routePassengerRepository.findByUserAndRoute(userEntity, routeEntity).orElseThrow(() -> new RouteNotInDbException("Route not found"));
 
@@ -64,11 +66,14 @@ public class RouteManager {
         return routeRepository.save(routeEntity);
     }
 
-    public RouteEntity removePassengerFromRoute(long routeId, String fullName) throws RouteNotInDbException, UserNotInDbException {
-        RouteEntity routeEntity = routeRepository.findById(routeId).orElseThrow(() -> new RouteNotInDbException("Route not found"));
-        UserEntity userEntity = userRepository.findByFullname(fullName).orElseThrow(() -> new UserNotInDbException("User not found"));
+    public RouteEntity removePassengerFromRoute(Long routeId, String fullName) throws RouteNotInDbException, UserNotInDbException {
+        RouteEntity routeEntity = routeRepository.findById(routeId).orElseThrow(()
+                -> new RouteNotInDbException("Route not found"));
+        UserEntity userEntity = userRepository.findByFullname(fullName).orElseThrow(()
+                -> new UserNotInDbException("User not found"));
 
-        RoutePassengerEntity passengerEntity = routePassengerRepository.findByUserAndRoute(userEntity, routeEntity).orElseThrow(() -> new RouteNotInDbException("Passenger not found"));
+        RoutePassengerEntity passengerEntity = routePassengerRepository.findByUserAndRoute(userEntity, routeEntity).orElseThrow(()
+                -> new RouteNotInDbException("Passenger not found"));
 
         routeEntity.getPassengers().remove(passengerEntity);
         routeEntity.setSeatsAvailable(routeEntity.getSeatsAvailable() + 1);
@@ -77,7 +82,15 @@ public class RouteManager {
         return routeRepository.save(routeEntity);
     }
 
-    public List<RouteEntity> getRoutesByUser(long userId) throws UserNotInDbException, NoRoutesFoundException {
+    public void removeRoute(Long routeId) throws RouteNotInDbException {
+        RouteEntity routeEntity = routeRepository.findById(routeId).orElseThrow(()
+                -> new RouteNotInDbException("Route not found"));
+
+        routePassengerRepository.deleteAll(routeEntity.getPassengers());
+        routeRepository.delete(routeEntity);
+    }
+
+    public List<RouteEntity> getRoutesByUser(Long userId) throws UserNotInDbException, NoRoutesFoundException {
         Optional<List<RouteEntity>> routeEntities = routeRepository.findByDriverOrPassenger(userRepository.findById(userId).orElseThrow(()
                 -> new UserNotInDbException(String.format("User with ID %d not found", userId))));
         if(routeEntities.isEmpty()){
@@ -86,7 +99,7 @@ public class RouteManager {
         return routeEntities.get();
     }
 
-    public List<RouteEntity> getRoutesBySchool(long userId, String school) throws UserNotInDbException, NoRoutesFoundException {
+    public List<RouteEntity> getRoutesBySchool(Long userId, String school) throws UserNotInDbException, NoRoutesFoundException {
         Optional<List<RouteEntity>> routeEntities = routeRepository.findByDriverSchool(school, userRepository.findById(userId).orElseThrow(()
                 -> new UserNotInDbException(String.format("User with ID %d not found", userId))));
         if(routeEntities.isEmpty()){
@@ -95,7 +108,7 @@ public class RouteManager {
         return routeEntities.get();
     }
 
-    public List<RouteEntity> getRoutesBySchoolAndSearch(long userId, String school, String search) throws UserNotInDbException, NoRoutesFoundException {
+    public List<RouteEntity> getRoutesBySchoolAndSearch(Long userId, String school, String search) throws UserNotInDbException, NoRoutesFoundException {
         String searchTwo = "%" + search + "%";
         Optional<List<RouteEntity>> routeEntities = routeRepository.findByDriverSchoolAndSearch(school, searchTwo, userRepository.findById(userId).orElseThrow(()
                 -> new UserNotInDbException(String.format("User with ID %d not found", userId))));
@@ -110,7 +123,8 @@ public class RouteManager {
         RouteEntity routeEntity = new RouteEntity();
         routeEntity.setDate(routeDto.getDate());
         routeEntity.setStops(routeDto.getStops());
-        routeEntity.setDriver(userRepository.findById(routeDto.getDriverId()).orElseThrow(() -> new UserNotInDbException(String.format("User with ID %d not found", routeDto.getDriverId()))));
+        routeEntity.setDriver(userRepository.findById(routeDto.getDriverId()).orElseThrow(()
+                -> new UserNotInDbException(String.format("User with ID %d not found", routeDto.getDriverId()))));
         routeEntity.setFromLocation(routeDto.getFromLocation());
         routeEntity.setSeatsAvailable(routeDto.getSeatsAvailable());
         routeEntity.setTime(routeDto.getTime());
@@ -119,8 +133,10 @@ public class RouteManager {
 
     private RoutePassengerEntity convertRoutePassengerDtoToRoutePassengerEntity(RoutePassengerDto routePassengerDto) throws UserNotInDbException, RouteNotInDbException {
         RoutePassengerEntity routePassengerEntity = new RoutePassengerEntity();
-        routePassengerEntity.setUser(userRepository.findById(routePassengerDto.getUserId()).orElseThrow(() -> new UserNotInDbException(String.format("User with ID %d not found", routePassengerDto.getUserId()))));
-        routePassengerEntity.setRoute(routeRepository.findById(routePassengerDto.getRouteId()).orElseThrow(() -> new RouteNotInDbException(String.format("Route with ID %d not found", routePassengerDto.getRouteId()))));
+        routePassengerEntity.setUser(userRepository.findById(routePassengerDto.getUserId()).orElseThrow(()
+                -> new UserNotInDbException(String.format("User with ID %d not found", routePassengerDto.getUserId()))));
+        routePassengerEntity.setRoute(routeRepository.findById(routePassengerDto.getRouteId()).orElseThrow(()
+                -> new RouteNotInDbException(String.format("Route with ID %d not found", routePassengerDto.getRouteId()))));
         routePassengerEntity.setNote(routePassengerDto.getNote());
         routePassengerEntity.setPickupLocation(routePassengerDto.getPickupLocation());
         return routePassengerEntity;

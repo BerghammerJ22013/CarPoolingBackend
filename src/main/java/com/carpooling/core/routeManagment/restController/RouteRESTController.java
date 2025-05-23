@@ -6,6 +6,7 @@ import com.carpooling.core.routeManagment.rest.dtos.RoutePassengerDto;
 import com.carpooling.core.routeManagment.rest.resources.RouteResource;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -22,17 +23,17 @@ public class RouteRESTController {
     }
 
     @GetMapping(value = "/carpooling/route/{userId}")
-    public List<RouteResource> getRoutesByUser(@PathVariable long userId) {
+    public List<RouteResource> getRoutesByUser(@PathVariable Long userId) {
         return routeDataService.getRoutesByUser(userId);
     }
 
     @GetMapping(value = "/carpooling/route/{userId}/{school}")
-    public List<RouteResource> getRoutesBySchool(@PathVariable long userId, @PathVariable String school) {
+    public List<RouteResource> getRoutesBySchool(@PathVariable Long userId, @PathVariable String school) {
         return routeDataService.getRoutesBySchool(userId, school);
     }
 
     @GetMapping(value = "/carpooling/route/{userId}/{school}/search/{search}")
-    public List<RouteResource> getRoutesBySchoolAndSearch(@PathVariable long userId, @PathVariable String school, @PathVariable String search) {
+    public List<RouteResource> getRoutesBySchoolAndSearch(@PathVariable Long userId, @PathVariable String school, @PathVariable String search) {
         return routeDataService.getRoutesBySchoolAndSearch(userId, school, search);
     }
 
@@ -47,7 +48,13 @@ public class RouteRESTController {
     }
 
     @DeleteMapping(value = "/carpooling/route/{routeId}/passenger/{fullName}")
-    public RouteResource removePassengerFromRoute(@PathVariable long routeId, @PathVariable String fullName) {
+    public RouteResource removePassengerFromRoute(@PathVariable Long routeId, @PathVariable String fullName) {
         return routeDataService.removePassengerFromRoute(routeId, fullName);
+    }
+
+    @DeleteMapping(value = "/carpooling/route/{routeId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void removeRoute(@PathVariable Long routeId) {
+         routeDataService.removeRoute(routeId);
     }
 }

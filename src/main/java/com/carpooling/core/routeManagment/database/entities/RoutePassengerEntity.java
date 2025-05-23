@@ -1,6 +1,7 @@
 package com.carpooling.core.routeManagment.database.entities;
 
 import com.carpooling.core.userManagement.database.entities.UserEntity;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.Data;
 

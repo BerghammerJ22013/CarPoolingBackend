@@ -12,11 +12,15 @@ import com.carpooling.core.routeManagment.rest.resources.RoutePassengerResource;
 import com.carpooling.core.routeManagment.rest.resources.RouteResource;
 import com.carpooling.core.userManagement.database.entities.UserEntity;
 import com.carpooling.core.userManagement.database.exceptions.UserNotInDbException;
+import com.mysql.cj.log.Log;
 import jakarta.validation.Valid;
+import org.hibernate.Hibernate;
+import org.hibernate.LazyInitializationException;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 public class RouteDataService {
     @Autowired
@@ -46,7 +50,7 @@ public class RouteDataService {
         }
     }
 
-    public RouteResource removePassengerFromRoute(long routeId, String fullName) {
+    public RouteResource removePassengerFromRoute(Long routeId, String fullName) {
         try {
             return convertRouteEntityToRouteResource(routeManager.removePassengerFromRoute(routeId, fullName));
         } catch (RouteNotInDbException | UserNotInDbException e) {
@@ -54,7 +58,15 @@ public class RouteDataService {
         }
     }
 
-    public List<RouteResource> getRoutesByUser(long userId) {
+    public void removeRoute(Long routeId) {
+        try {
+            routeManager.removeRoute(routeId);
+        } catch (RouteNotInDbException e) {
+            throw new InvalidRouteRemovalException(e.getMessage());
+        }
+    }
+
+    public List<RouteResource> getRoutesByUser(Long userId) {
         List<RouteEntity> routeEntities = null;
         try {
             routeEntities = routeManager.getRoutesByUser(userId);
@@ -63,7 +75,7 @@ public class RouteDataService {
                 routeResources.add(convertRouteEntityToRouteResource(routeEntity));
             }
             if (routeResources.isEmpty()) {
-                throw new InvalidGetRoutesByUserException(String.format("User with ID %d has no routes", userId));
+                throw new UserHasNoRoutesException(String.format("User with ID %d has no routes", userId));
             }
             return routeResources;
         } catch (UserNotInDbException | NoRoutesFoundException e) {
@@ -71,7 +83,7 @@ public class RouteDataService {
         }
     }
 
-    public List<RouteResource> getRoutesBySchool(long userId, String school) {
+    public List<RouteResource> getRoutesBySchool(Long userId, String school) {
         List<RouteEntity> routeEntities = null;
         try {
             routeEntities = routeManager.getRoutesBySchool(userId, school);
@@ -88,7 +100,7 @@ public class RouteDataService {
         }
     }
 
-    public List<RouteResource> getRoutesBySchoolAndSearch(long userId, String school, String search) {
+    public List<RouteResource> getRoutesBySchoolAndSearch(Long userId, String school, String search) {
         List<RouteEntity> routeEntities = null;
         try {
             routeEntities = routeManager.getRoutesBySchoolAndSearch(userId, school, search);
@@ -100,7 +112,7 @@ public class RouteDataService {
                 throw new InvalidGetRoutesBySchoolAndSearchException(String.format("User with ID %d has no routes", userId));
             }
             return routeResources;
-        } catch (UserNotInDbException | NoRoutesFoundException e) {
+        } catch (UserNotInDbException | NoRoutesFoundException  e) {
             throw new InvalidGetRoutesBySchoolAndSearchException(e.getMessage());
         }
     }
@@ -119,9 +131,11 @@ public class RouteDataService {
             routeResource.setPassengers(passengers);
             return routeResource;
         }
-        for(RoutePassengerEntity routePassengerEntity : routeEntity.getPassengers()){
+
+        for (RoutePassengerEntity routePassengerEntity : routeEntity.getPassengers()) {
             passengers.add(convertRoutePassengerEntityToRoutePassengerResource(routePassengerEntity));
         }
+
         routeResource.setPassengers(passengers);
         return routeResource;
     }
