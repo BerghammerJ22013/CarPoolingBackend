@@ -22,6 +22,14 @@ public class UserManager {
     private PasswordEncoder passwordEncoder;
 
 
+    public UserEntity getUserById(long id) throws UserNotInDbException {
+        return userRepository.findById(id).orElseThrow(() -> new UserNotInDbException(String.format("User with ID %d not found", id)));
+    }
+
+    public UserEntity getUserByFullname(String fullname) throws UserNotInDbException {
+        return userRepository.findByFullname(fullname).orElseThrow(() -> new UserNotInDbException(String.format("User with Fullname %s not found", fullname)));
+    }
+
     public UserEntity registerUser(UserDto userDto) throws UserAlreadyExistsException {
         if (userRepository.existsByEmail(userDto.getEmail())) {
             throw new UserAlreadyExistsException(String.format("User with this email %s or fullname %s already exists",

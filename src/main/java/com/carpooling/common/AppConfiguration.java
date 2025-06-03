@@ -1,7 +1,7 @@
 package com.carpooling.common;
 
-import com.carpooling.core.chatManagment.rest.ChatDataService;
-import com.carpooling.core.chatManagment.rest.ChatManager;
+import com.carpooling.core.notificationManagment.rest.NotificationDataService;
+import com.carpooling.core.notificationManagment.rest.NotificationManager;
 import com.carpooling.core.routeManagment.rest.RouteDataService;
 import com.carpooling.core.routeManagment.rest.RouteManager;
 import com.carpooling.core.userManagement.rest.UserDataService;
@@ -26,8 +26,8 @@ public class AppConfiguration {
     }
 
     @Bean
-    public ChatDataService createChatDataService(){
-        ChatDataService c = new ChatDataService();
+    public NotificationDataService createChatDataService(){
+        NotificationDataService c = new NotificationDataService();
         return c;
     }
 
@@ -44,8 +44,8 @@ public class AppConfiguration {
     }
 
     @Bean
-    public ChatManager createChatManager(){
-        ChatManager c = new ChatManager();
+    public NotificationManager createChatManager(){
+        NotificationManager c = new NotificationManager();
         return c;
     }
 
