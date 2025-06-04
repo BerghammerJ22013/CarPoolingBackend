@@ -22,7 +22,7 @@ public class NotificationRESTController {
         return notificationDataService.getNotificationsByReceiver(userId);
     }
 
-    @GetMapping(value = "/carpooling/notification/{userId}")
+    @GetMapping(value = "/carpooling/notification/{userId}/today")
     public List<NotificationResource> getNotificationsByReceiverOfToday(@PathVariable Long userId){
         return notificationDataService.getNotificationsByReceiverOfToday(userId);
     }
