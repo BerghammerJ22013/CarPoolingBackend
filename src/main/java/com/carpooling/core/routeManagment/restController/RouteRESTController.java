@@ -13,46 +13,47 @@ import java.util.List;
 
 @CrossOrigin
 @RestController
+@RequestMapping("/carpooling/route")
 public class RouteRESTController {
     @Autowired
     private RouteDataService routeDataService;
 
-    @PostMapping(value = "/carpooling/route")
+    @PostMapping
     public RouteResource addRoute(@Valid @RequestBody RouteDto routeDto) {
         return routeDataService.addRoute(routeDto);
     }
 
-    @GetMapping(value = "/carpooling/route/{userId}")
+    @GetMapping(value = "/{userId}")
     public List<RouteResource> getRoutesByUser(@PathVariable Long userId) {
         return routeDataService.getRoutesByUser(userId);
     }
 
-    @GetMapping(value = "/carpooling/route/{userId}/{school}")
+    @GetMapping(value = "/{userId}/{school}")
     public List<RouteResource> getRoutesBySchool(@PathVariable Long userId, @PathVariable String school) {
         return routeDataService.getRoutesBySchool(userId, school);
     }
 
-    @GetMapping(value = "/carpooling/route/{userId}/{school}/search/{search}")
+    @GetMapping(value = "/{userId}/{school}/search/{search}")
     public List<RouteResource> getRoutesBySchoolAndSearch(@PathVariable Long userId, @PathVariable String school, @PathVariable String search) {
         return routeDataService.getRoutesBySchoolAndSearch(userId, school, search);
     }
 
-    @PutMapping(value = "/carpooling/route/user")
+    @PutMapping(value = "/user")
     public RouteResource addUserToRoute(@Valid @RequestBody RoutePassengerDto routePassengerDto) {
         return routeDataService.addUserToRoute(routePassengerDto);
     }
 
-    @DeleteMapping(value = "/carpooling/route/user")
+    @DeleteMapping(value = "/user")
     public RouteResource removeUserFromRoute(@Valid @RequestBody RoutePassengerDto routePassengerDto) {
         return routeDataService.removeUserFromRoute(routePassengerDto);
     }
 
-    @DeleteMapping(value = "/carpooling/route/{routeId}/passenger/{fullName}")
+    @DeleteMapping(value = "/{routeId}/passenger/{fullName}")
     public RouteResource removePassengerFromRoute(@PathVariable Long routeId, @PathVariable String fullName) {
         return routeDataService.removePassengerFromRoute(routeId, fullName);
     }
 
-    @DeleteMapping(value = "/carpooling/route/{routeId}")
+    @DeleteMapping(value = "/{routeId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void removeRoute(@PathVariable Long routeId) {
          routeDataService.removeRoute(routeId);

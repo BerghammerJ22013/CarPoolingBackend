@@ -49,5 +49,11 @@ public class UserDataService {
     }
 
 
-
+    public UserResource getUserByFullName(String fullName) {
+        try {
+            return convertUserEntityToUserResource(userManager.getUserByFullname(fullName));
+        } catch (UserNotInDbException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }

@@ -61,7 +61,7 @@ public class RouteDataService {
     public void removeRoute(Long routeId) {
         try {
             routeManager.removeRoute(routeId);
-        } catch (RouteNotInDbException e) {
+        } catch (RouteNotInDbException | UserNotInDbException e) {
             throw new InvalidRouteRemovalException(e.getMessage());
         }
     }

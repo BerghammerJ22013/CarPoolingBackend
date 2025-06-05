@@ -1,5 +1,7 @@
 package com.carpooling.core.routeManagment.rest;
 
+import com.carpooling.core.notificationManagment.rest.NotificationManager;
+import com.carpooling.core.notificationManagment.rest.dtos.NotificationDto;
 import com.carpooling.core.routeManagment.database.entities.RouteEntity;
 import com.carpooling.core.routeManagment.database.entities.RoutePassengerEntity;
 import com.carpooling.core.routeManagment.database.exceptions.NoRoutesFoundException;
@@ -14,6 +16,7 @@ import com.carpooling.core.userManagement.database.exceptions.UserNotInDbExcepti
 import com.carpooling.core.userManagement.rest.UserManager;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 
@@ -27,6 +30,9 @@ public class RouteManager {
     @Autowired
     private UserManager userManager;
 
+    @Autowired
+    private NotificationManager notificationManager;
+
     public RouteEntity addRoute(RouteDto routeDto) throws UserNotInDbException {
         return routeRepository.save(convertRouteDtoToRouteEntity(routeDto));
     }
@@ -37,6 +43,13 @@ public class RouteManager {
         UserEntity userEntity = userManager.getUserById(routePassengerDto.getUserId());
 
         RoutePassengerEntity passengerEntity = convertRoutePassengerDtoToRoutePassengerEntity(routePassengerDto);
+
+        NotificationDto notificationDto = new NotificationDto();
+        notificationDto.setReceiverId(routeEntity.getDriver().getId());
+        notificationDto.setMessage("Hat sich für deine Fahrt am " + routeEntity.getDate().format(DateTimeFormatter.ofPattern("dd.MMMM.yyyy")) + " um " + routeEntity.getTime() + " ab " + routePassengerDto.getPickupLocation() + " angemeldet.");
+        notificationDto.setSenderId(userEntity.getId());
+
+        notificationManager.sendNotification(notificationDto);
 
         boolean alreadyAdded = routeEntity.getPassengers().stream()
                 .anyMatch(p -> p.getUser().getId().equals(passengerEntity.getUser().getId()));
@@ -57,6 +70,13 @@ public class RouteManager {
 
         RoutePassengerEntity passengerEntity = routePassengerRepository.findByUserAndRoute(userEntity, routeEntity).orElseThrow(() -> new RouteNotInDbException("Route not found"));
 
+        NotificationDto notificationDto = new NotificationDto();
+        notificationDto.setReceiverId(routeEntity.getDriver().getId());
+        notificationDto.setMessage("Hat sich für deine Fahrt am " + routeEntity.getDate().format(DateTimeFormatter.ofPattern("dd.MMMM.yyyy")) + " um " + routeEntity.getTime() + " abgemeldet.");
+        notificationDto.setSenderId(userEntity.getId());
+
+        notificationManager.sendNotification(notificationDto);
+
         routeEntity.getPassengers().remove(passengerEntity);
         routeEntity.setSeatsAvailable(routeEntity.getSeatsAvailable() + 1);
         routePassengerRepository.delete(passengerEntity);
@@ -72,6 +92,13 @@ public class RouteManager {
         RoutePassengerEntity passengerEntity = routePassengerRepository.findByUserAndRoute(userEntity, routeEntity).orElseThrow(()
                 -> new RouteNotInDbException("Passenger not found"));
 
+        NotificationDto notificationDto = new NotificationDto();
+        notificationDto.setSenderId(routeEntity.getDriver().getId());
+        notificationDto.setMessage("Du wurdest aus der Fahrt entfernt.");
+        notificationDto.setReceiverId(userEntity.getId());
+
+        notificationManager.sendNotification(notificationDto);
+
         routeEntity.getPassengers().remove(passengerEntity);
         routeEntity.setSeatsAvailable(routeEntity.getSeatsAvailable() + 1);
         routePassengerRepository.delete(passengerEntity);
@@ -79,9 +106,18 @@ public class RouteManager {
         return routeRepository.save(routeEntity);
     }
 
-    public void removeRoute(Long routeId) throws RouteNotInDbException {
+    public void removeRoute(Long routeId) throws RouteNotInDbException, UserNotInDbException {
         RouteEntity routeEntity = routeRepository.findById(routeId).orElseThrow(()
                 -> new RouteNotInDbException("Route not found"));
+
+        NotificationDto notificationDto = new NotificationDto();
+        notificationDto.setMessage("Die Route am " + routeEntity.getDate().format(DateTimeFormatter.ofPattern("dd.MMMM.yyyy")) + " um " + routeEntity.getTime() + " wurde gelöscht.");
+        notificationDto.setSenderId(routeEntity.getDriver().getId());
+
+        for(RoutePassengerEntity rpe : routeEntity.getPassengers()){
+            notificationDto.setReceiverId(rpe.getUser().getId());
+            notificationManager.sendNotification(notificationDto);
+        }
 
         routePassengerRepository.deleteAll(routeEntity.getPassengers());
         routeRepository.delete(routeEntity);

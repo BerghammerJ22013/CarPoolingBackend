@@ -12,27 +12,27 @@ import java.util.List;
 
 @CrossOrigin
 @RestController
-//@RequestMapping(value = "/carpooling/notification")
+@RequestMapping(value = "/carpooling/notification")
 public class NotificationRESTController {
     @Autowired
     private NotificationDataService notificationDataService;
 
-    @GetMapping(value = "/carpooling/notification/{userId}")
+    @GetMapping(value = "/{userId}")
     public List<NotificationResource> getNotificationsByReceiver(@PathVariable Long userId){
         return notificationDataService.getNotificationsByReceiver(userId);
     }
 
-    @GetMapping(value = "/carpooling/notification/{userId}/today")
+    @GetMapping(value = "/{userId}/today")
     public List<NotificationResource> getNotificationsByReceiverOfToday(@PathVariable Long userId){
         return notificationDataService.getNotificationsByReceiverOfToday(userId);
     }
 
-    @PostMapping(value = "/carpooling/notification")
+    @PostMapping
     public NotificationResource sendNotification(@Valid @RequestBody NotificationDto notificationDto){
         return notificationDataService.sendNotification(notificationDto);
     }
 
-    @DeleteMapping(value = "/carpooling/notification/{notificationId}")
+    @DeleteMapping(value = "/{notificationId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void removeNotification(@PathVariable Long notificationId){
         notificationDataService.removeNotification(notificationId);

@@ -10,7 +10,6 @@ import com.carpooling.core.notificationManagment.rest.exception.InvalidRemoveNot
 import com.carpooling.core.notificationManagment.rest.exception.InvalidSendNotificationException;
 import com.carpooling.core.notificationManagment.rest.resources.NotificationResource;
 import com.carpooling.core.userManagement.database.exceptions.UserNotInDbException;
-import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
@@ -46,7 +45,7 @@ public class NotificationDataService {
 
     public NotificationResource sendNotification(NotificationDto notificationDto) {
         try {
-            return convertNotificationEntityToNotificationResource(notificationManager.sendRoute(notificationDto));
+            return convertNotificationEntityToNotificationResource(notificationManager.sendNotification(notificationDto));
         } catch (UserNotInDbException e) {
             throw new InvalidSendNotificationException(e.getMessage());
         }

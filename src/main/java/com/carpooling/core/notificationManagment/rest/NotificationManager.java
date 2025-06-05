@@ -43,7 +43,7 @@ public class NotificationManager {
         return result.get();
     }
 
-    public NotificationEntity sendRoute(NotificationDto notificationDto) throws UserNotInDbException {
+    public NotificationEntity sendNotification(NotificationDto notificationDto) throws UserNotInDbException {
         return notificationRepository.save(convertNotificationDtoToNotificationEntity(notificationDto));
     }
 
