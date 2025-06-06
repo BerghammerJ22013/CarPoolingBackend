@@ -1,6 +1,6 @@
-package com.carpooling.core.routeManagment.rest;
+package com.carpooling.core.routeManagment;
 
-import com.carpooling.core.notificationManagment.rest.NotificationManager;
+import com.carpooling.core.notificationManagment.NotificationManager;
 import com.carpooling.core.notificationManagment.rest.dtos.NotificationDto;
 import com.carpooling.core.routeManagment.database.entities.RouteEntity;
 import com.carpooling.core.routeManagment.database.entities.RoutePassengerEntity;
@@ -13,7 +13,7 @@ import com.carpooling.core.routeManagment.rest.dtos.RouteDto;
 import com.carpooling.core.routeManagment.rest.dtos.RoutePassengerDto;
 import com.carpooling.core.userManagement.database.entities.UserEntity;
 import com.carpooling.core.userManagement.database.exceptions.UserNotInDbException;
-import com.carpooling.core.userManagement.rest.UserManager;
+import com.carpooling.core.userManagement.UserManager;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.format.DateTimeFormatter;
@@ -37,7 +37,7 @@ public class RouteManager {
         return routeRepository.save(convertRouteDtoToRouteEntity(routeDto));
     }
 
-    public RouteEntity addUserToRoute(RoutePassengerDto routePassengerDto) throws UserNotInDbException, RouteNotInDbException, UserAlreadyInRouteExceotion {
+    public RouteEntity addPassengerToRoute(RoutePassengerDto routePassengerDto) throws UserNotInDbException, RouteNotInDbException, UserAlreadyInRouteExceotion {
         RouteEntity routeEntity = routeRepository.findById(routePassengerDto.getRouteId()).orElseThrow(()
                 -> new RouteNotInDbException("Route not found"));
         UserEntity userEntity = userManager.getUserById(routePassengerDto.getUserId());
@@ -54,16 +54,17 @@ public class RouteManager {
         boolean alreadyAdded = routeEntity.getPassengers().stream()
                 .anyMatch(p -> p.getUser().getId().equals(passengerEntity.getUser().getId()));
 
-        if (!alreadyAdded) {
-            routeEntity.getPassengers().add(convertRoutePassengerDtoToRoutePassengerEntity(routePassengerDto));
-            routeEntity.setSeatsAvailable(routeEntity.getSeatsAvailable() - 1);
-        }else{
+        if (alreadyAdded) {
             throw new UserAlreadyInRouteExceotion("User already in route");
         }
+
+        routeEntity.getPassengers().add(convertRoutePassengerDtoToRoutePassengerEntity(routePassengerDto));
+        routeEntity.setSeatsAvailable(routeEntity.getSeatsAvailable() - 1);
+        
         return routeRepository.save(routeEntity);
     }
 
-    public RouteEntity removeUserFromRoute(RoutePassengerDto routePassengerDto) throws RouteNotInDbException, UserNotInDbException {
+    public RouteEntity removePassengerFromRoute(RoutePassengerDto routePassengerDto) throws RouteNotInDbException, UserNotInDbException {
         RouteEntity routeEntity = routeRepository.findById(routePassengerDto.getRouteId()).orElseThrow(()
                 -> new RouteNotInDbException("Route not found"));
         UserEntity userEntity = userManager.getUserById(routePassengerDto.getUserId());
@@ -84,12 +85,15 @@ public class RouteManager {
         return routeRepository.save(routeEntity);
     }
 
-    public RouteEntity removePassengerFromRoute(Long routeId, String fullName) throws RouteNotInDbException, UserNotInDbException {
+    public RouteEntity kickPassengerFromRoute(Long routeId, String fullName)
+            throws RouteNotInDbException, UserNotInDbException {
         RouteEntity routeEntity = routeRepository.findById(routeId).orElseThrow(()
                 -> new RouteNotInDbException("Route not found"));
-        UserEntity userEntity = userManager.getUserByFullname(fullName);
+        UserEntity userEntity = userManager.getUserByfullName(fullName);
 
-        RoutePassengerEntity passengerEntity = routePassengerRepository.findByUserAndRoute(userEntity, routeEntity).orElseThrow(()
+        RoutePassengerEntity passengerEntity = routePassengerRepository
+                .findByUserAndRoute(userEntity, routeEntity)
+                .orElseThrow(()
                 -> new RouteNotInDbException("Passenger not found"));
 
         NotificationDto notificationDto = new NotificationDto();
@@ -111,7 +115,8 @@ public class RouteManager {
                 -> new RouteNotInDbException("Route not found"));
 
         NotificationDto notificationDto = new NotificationDto();
-        notificationDto.setMessage("Die Route am " + routeEntity.getDate().format(DateTimeFormatter.ofPattern("dd.MMMM.yyyy")) + " um " + routeEntity.getTime() + " wurde gelöscht.");
+        notificationDto.setMessage("Die Route am " + routeEntity.getDate()
+                .format(DateTimeFormatter.ofPattern("dd.MMMM.yyyy")) + " um " + routeEntity.getTime() + " wurde gelöscht.");
         notificationDto.setSenderId(routeEntity.getDriver().getId());
 
         for(RoutePassengerEntity rpe : routeEntity.getPassengers()){
@@ -124,15 +129,19 @@ public class RouteManager {
     }
 
     public List<RouteEntity> getRoutesByUser(Long userId) throws UserNotInDbException, NoRoutesFoundException {
-        Optional<List<RouteEntity>> routeEntities = routeRepository.findByDriverOrPassenger(userManager.getUserById(userId));
+        Optional<List<RouteEntity>> routeEntities = routeRepository
+                .findByDriverOrPassenger(userManager.getUserById(userId));
+        
         if(routeEntities.isEmpty()){
             throw new NoRoutesFoundException("No routes found");
         }
+        
         return routeEntities.get();
     }
 
     public List<RouteEntity> getRoutesBySchool(Long userId, String school) throws UserNotInDbException, NoRoutesFoundException {
-        Optional<List<RouteEntity>> routeEntities = routeRepository.findByDriverSchool(school, userManager.getUserById(userId));
+        Optional<List<RouteEntity>> routeEntities = routeRepository
+                .findByDriverSchool(school, userManager.getUserById(userId));
         if(routeEntities.isEmpty()){
             throw new NoRoutesFoundException("No routes found");
         }

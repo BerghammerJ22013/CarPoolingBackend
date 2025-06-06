@@ -28,7 +28,7 @@ public interface RouteRepository extends CrudRepository<RouteEntity, Long> {
       AND r.seatsAvailable > 0 
       AND (
           LOWER(r.fromLocation) LIKE LOWER(:search) 
-          OR LOWER(r.driver.fullname) LIKE LOWER(:search)
+          OR LOWER(r.driver.fullName) LIKE LOWER(:search)
           OR EXISTS (
               SELECT s FROM RouteEntity r2 JOIN r2.stops s 
               WHERE r2 = r AND LOWER(s) LIKE LOWER(:search)

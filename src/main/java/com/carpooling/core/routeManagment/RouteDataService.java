@@ -1,4 +1,4 @@
-package com.carpooling.core.routeManagment.rest;
+package com.carpooling.core.routeManagment;
 
 import com.carpooling.core.routeManagment.database.entities.RouteEntity;
 import com.carpooling.core.routeManagment.database.entities.RoutePassengerEntity;
@@ -10,17 +10,11 @@ import com.carpooling.core.routeManagment.rest.dtos.RoutePassengerDto;
 import com.carpooling.core.routeManagment.rest.exceptions.*;
 import com.carpooling.core.routeManagment.rest.resources.RoutePassengerResource;
 import com.carpooling.core.routeManagment.rest.resources.RouteResource;
-import com.carpooling.core.userManagement.database.entities.UserEntity;
 import com.carpooling.core.userManagement.database.exceptions.UserNotInDbException;
-import com.mysql.cj.log.Log;
-import jakarta.validation.Valid;
-import org.hibernate.Hibernate;
-import org.hibernate.LazyInitializationException;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
 
 public class RouteDataService {
     @Autowired
@@ -34,25 +28,25 @@ public class RouteDataService {
         }
     }
 
-    public RouteResource addUserToRoute(RoutePassengerDto routePassengerDto) {
+    public RouteResource addPassengerToRoute(RoutePassengerDto routePassengerDto) {
         try {
-            return convertRouteEntityToRouteResource(routeManager.addUserToRoute(routePassengerDto));
+            return convertRouteEntityToRouteResource(routeManager.addPassengerToRoute(routePassengerDto));
         } catch (UserNotInDbException | RouteNotInDbException | UserAlreadyInRouteExceotion e) {
             throw new InvalidAddUserToRouteException(e.getMessage());
         }
     }
 
-    public RouteResource removeUserFromRoute(RoutePassengerDto routePassengerDto) {
+    public RouteResource removePassengerFromRoute(RoutePassengerDto routePassengerDto) {
         try{
-            return convertRouteEntityToRouteResource(routeManager.removeUserFromRoute(routePassengerDto));
+            return convertRouteEntityToRouteResource(routeManager.removePassengerFromRoute(routePassengerDto));
         } catch (UserNotInDbException | RouteNotInDbException e) {
             throw new InvalidRemovalOfUserException(e.getMessage());
         }
     }
 
-    public RouteResource removePassengerFromRoute(Long routeId, String fullName) {
+    public RouteResource kickPassengerFromRoute(Long routeId, String fullName) {
         try {
-            return convertRouteEntityToRouteResource(routeManager.removePassengerFromRoute(routeId, fullName));
+            return convertRouteEntityToRouteResource(routeManager.kickPassengerFromRoute(routeId, fullName));
         } catch (RouteNotInDbException | UserNotInDbException e) {
             throw new InvalidRemovalOfUserException(e.getMessage());
         }
@@ -122,7 +116,7 @@ public class RouteDataService {
         routeResource.setId(routeEntity.getId());
         routeResource.setDate(routeEntity.getDate());
         routeResource.setStops(routeEntity.getStops());
-        routeResource.setDriverName(routeEntity.getDriver().getFullname());
+        routeResource.setDriverName(routeEntity.getDriver().getFullName());
         routeResource.setFromLocation(routeEntity.getFromLocation());
         routeResource.setSeatsAvailable(routeEntity.getSeatsAvailable());
         routeResource.setTime(routeEntity.getTime());
@@ -145,7 +139,7 @@ public class RouteDataService {
         routePassengerResource.setNote(routePassengerEntity.getNote());
         routePassengerResource.setPickupLocation(routePassengerEntity.getPickupLocation());
         routePassengerResource.setRouteId(routePassengerEntity.getRoute().getId());
-        routePassengerResource.setFullName(routePassengerEntity.getUser().getFullname());
+        routePassengerResource.setFullName(routePassengerEntity.getUser().getFullName());
         return  routePassengerResource;
     }
 

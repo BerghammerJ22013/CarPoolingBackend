@@ -1,11 +1,11 @@
 package com.carpooling.common;
 
-import com.carpooling.core.notificationManagment.rest.NotificationDataService;
-import com.carpooling.core.notificationManagment.rest.NotificationManager;
-import com.carpooling.core.routeManagment.rest.RouteDataService;
-import com.carpooling.core.routeManagment.rest.RouteManager;
-import com.carpooling.core.userManagement.rest.UserDataService;
-import com.carpooling.core.userManagement.rest.UserManager;
+import com.carpooling.core.notificationManagment.NotificationDataService;
+import com.carpooling.core.notificationManagment.NotificationManager;
+import com.carpooling.core.routeManagment.RouteDataService;
+import com.carpooling.core.routeManagment.RouteManager;
+import com.carpooling.core.userManagement.UserDataService;
+import com.carpooling.core.userManagement.UserManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;

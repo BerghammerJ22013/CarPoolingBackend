@@ -1,4 +1,4 @@
-package com.carpooling.core.userManagement.rest;
+package com.carpooling.core.userManagement;
 
 import com.carpooling.core.userManagement.database.entities.UserEntity;
 import com.carpooling.core.userManagement.database.exceptions.InvalidPasswordException;
@@ -26,15 +26,15 @@ public class UserManager {
         return userRepository.findById(id).orElseThrow(() -> new UserNotInDbException(String.format("User with ID %d not found", id)));
     }
 
-    public UserEntity getUserByFullname(String fullname) throws UserNotInDbException {
-        return userRepository.findByFullname(fullname).orElseThrow(() -> new UserNotInDbException(String.format("User with Fullname %s not found", fullname)));
+    public UserEntity getUserByfullName(String fullName) throws UserNotInDbException {
+        return userRepository.findByfullName(fullName).orElseThrow(() -> new UserNotInDbException(String.format("User with fullName %s not found", fullName)));
     }
 
     public UserEntity registerUser(UserDto userDto) throws UserAlreadyExistsException {
         if (userRepository.existsByEmail(userDto.getEmail())) {
-            throw new UserAlreadyExistsException(String.format("User with this email %s or fullname %s already exists",
+            throw new UserAlreadyExistsException(String.format("User with this email %s or fullName %s already exists",
                     userDto.getEmail(),
-                    userDto.getFullname()
+                    userDto.getFullName()
             ));
         }
         return userRepository.save(convertUserDtoToUserEntity(userDto));
@@ -65,7 +65,7 @@ public class UserManager {
 
     private UserEntity convertUserDtoToUserEntity(@Valid UserDto userDto) {
         UserEntity userEntity = new UserEntity();
-        userEntity.setFullname(userDto.getFullname());
+        userEntity.setFullName(userDto.getFullName());
         userEntity.setEmail(userDto.getEmail());
         userEntity.setPassword(passwordEncoder.encode(userDto.getPassword()));
         userEntity.setSchool(userDto.getSchool());

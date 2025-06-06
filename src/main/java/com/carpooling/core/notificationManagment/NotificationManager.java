@@ -1,4 +1,4 @@
-package com.carpooling.core.notificationManagment.rest;
+package com.carpooling.core.notificationManagment;
 
 import com.carpooling.core.notificationManagment.database.entities.NotificationEntity;
 import com.carpooling.core.notificationManagment.database.exception.NoNotificationsFoundException;
@@ -7,7 +7,7 @@ import com.carpooling.core.notificationManagment.database.repositories.Notificat
 import com.carpooling.core.notificationManagment.rest.dtos.NotificationDto;
 import com.carpooling.core.userManagement.database.entities.UserEntity;
 import com.carpooling.core.userManagement.database.exceptions.UserNotInDbException;
-import com.carpooling.core.userManagement.rest.UserManager;
+import com.carpooling.core.userManagement.UserManager;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.LocalDateTime;

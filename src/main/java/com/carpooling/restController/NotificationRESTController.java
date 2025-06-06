@@ -1,6 +1,6 @@
-package com.carpooling.core.notificationManagment.restController;
+package com.carpooling.restController;
 
-import com.carpooling.core.notificationManagment.rest.NotificationDataService;
+import com.carpooling.core.notificationManagment.NotificationDataService;
 import com.carpooling.core.notificationManagment.rest.dtos.NotificationDto;
 import com.carpooling.core.notificationManagment.rest.resources.NotificationResource;
 import jakarta.validation.Valid;
@@ -8,24 +8,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @CrossOrigin
 @RestController
-@RequestMapping(value = "/carpooling/notification")
+@RequestMapping(value = "/carpooling/notifications")
 public class NotificationRESTController {
     @Autowired
     private NotificationDataService notificationDataService;
-
-    @GetMapping(value = "/{userId}")
-    public List<NotificationResource> getNotificationsByReceiver(@PathVariable Long userId){
-        return notificationDataService.getNotificationsByReceiver(userId);
-    }
-
-    @GetMapping(value = "/{userId}/today")
-    public List<NotificationResource> getNotificationsByReceiverOfToday(@PathVariable Long userId){
-        return notificationDataService.getNotificationsByReceiverOfToday(userId);
-    }
 
     @PostMapping
     public NotificationResource sendNotification(@Valid @RequestBody NotificationDto notificationDto){

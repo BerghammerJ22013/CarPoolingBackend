@@ -1,4 +1,4 @@
-package com.carpooling.core.notificationManagment.rest;
+package com.carpooling.core.notificationManagment;
 
 import com.carpooling.core.notificationManagment.database.entities.NotificationEntity;
 import com.carpooling.core.notificationManagment.database.exception.NoNotificationsFoundException;
@@ -62,8 +62,8 @@ public class NotificationDataService {
     private NotificationResource convertNotificationEntityToNotificationResource(NotificationEntity notificationEntity){
         NotificationResource resource = new NotificationResource();
         resource.setId(notificationEntity.getId());
-        resource.setSenderFullname(notificationEntity.getSender().getFullname());
-        resource.setReceiverFullname(notificationEntity.getReceiver().getFullname());
+        resource.setSenderfullName(notificationEntity.getSender().getFullName());
+        resource.setReceiverfullName(notificationEntity.getReceiver().getFullName());
         resource.setMessage(notificationEntity.getMessage());
         resource.setTimestamp(notificationEntity.getTimeStamp());
         return resource;

@@ -1,4 +1,4 @@
-package com.carpooling.core.userManagement.rest;
+package com.carpooling.core.userManagement;
 
 import com.carpooling.core.userManagement.database.entities.UserEntity;
 import com.carpooling.core.userManagement.database.exceptions.InvalidPasswordException;
@@ -42,16 +42,16 @@ public class UserDataService {
     private UserResource convertUserEntityToUserResource(UserEntity userEntity) {
         UserResource userResource = new UserResource();
         userResource.setId(userEntity.getId());
-        userResource.setFullname(userEntity.getFullname());
+        userResource.setFullName(userEntity.getFullName());
         userResource.setEmail(userEntity.getEmail());
         userResource.setSchool(userEntity.getSchool());
         return userResource;
     }
 
 
-    public UserResource getUserByFullName(String fullName) {
+    public UserResource getUserByfullName(String fullName) {
         try {
-            return convertUserEntityToUserResource(userManager.getUserByFullname(fullName));
+            return convertUserEntityToUserResource(userManager.getUserByfullName(fullName));
         } catch (UserNotInDbException e) {
             throw new RuntimeException(e);
         }

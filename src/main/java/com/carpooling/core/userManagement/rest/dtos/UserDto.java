@@ -9,7 +9,7 @@ import lombok.Data;
 @Data
 public class UserDto {
     @NotNull
-    private String fullname;
+    private String fullName;
 
     @Email
     private String email;
